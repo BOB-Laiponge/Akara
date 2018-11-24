@@ -50,7 +50,8 @@ async def on_ready():
                 "faire croire aux humains que la magie n'existe pas",
                 "rechercher un apprenti plus jeune et plus puissant",
                 "parler avec des \"humains\"",
-                "calculer l'infini"
+                "calculer l'infini",
+                "parcoursup.exe"
             ])
         )
     )
