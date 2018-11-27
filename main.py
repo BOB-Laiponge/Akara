@@ -9,10 +9,16 @@ client = discord.Client()
 text_analyser = Analysis(client)
 
 
+''' These properties are used in order to retrieve the current version of the bot.
+Version code can be used in add-ons for example, in order to check if the version is new enough for a feature'''
+VERSION = "0.4.1"
+VERSION_CODE = 5
+
+
 @client.event
 async def on_ready():
     print('Logged in as :', client.user.name)
-    print('Version : 0.4.0')
+    print('Version : ', VERSION)
     print('ID:', client.user.id)
     await client.change_presence(
         status=discord.Status.online,

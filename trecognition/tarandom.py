@@ -74,9 +74,7 @@ async def q_mark(client, message, tag):
 @RestrictedCommandAccess([420316404881817613, 420316949776564234, 439740999326105601])
 async def test_stuff(client, message, tag):
     """ Example of a command, which is only executable with the @adm role """
-    return await message.channel.send("J'ai été entièrement codée par @BOB_Laiponge#3011.`\n"
-                                      "Je suis désormais codée pour python 3.7 (et versions supérieures"
-                                      " et utilise discord.py version 1.0.0a", tts=True)
+    return await message.channel.send("Un test ? Il n'y a pas de test en cours pour le moment ^^")
 
 
 @RestrictedCommandAccess([420316404881817613, 439740999326105601])
@@ -90,4 +88,6 @@ async def change_presence(client, message, tag):
         status=discord.Status.online,
         afk=False,
         activity=discord.Game(new_presence))
-    return await message.channel.send("Je suis maintenant en train de jouer à :{0}".format(new_presence))
+    await message.channel.send("*Attention : cette manière de changer la présence du bot est obselète et va bientôt"
+                               " être supprimée.\nMerci d'utiliser la commande `!presence` à la place.*")
+    return await message.channel.send("Je suis maintenant en train de jouer à : {0}".format(new_presence))

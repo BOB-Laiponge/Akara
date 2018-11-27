@@ -1,5 +1,6 @@
 import re
 
+from commands.others import help_command, presence
 from trecognition.politeness import say_hello, say_good_night, say_cc, say_hey, say_hi, say_hello_en, say_good_bye, \
     say_hello_2, say_plus_plus, say_bye
 from trecognition.tarandom import is_happy, insult, dice_launch, order66, moral_upper, joke_1, joke_2, q_mark, \
@@ -73,6 +74,13 @@ class Analysis:
             r"^.*bye.*$": say_bye,
             r"^.*(execute\s[l']*ord[er]{2}\s18).*$": say_bye
         }
+        self.__registered_commands = {
+            "presence": (presence, "défini une nouvelle présence pour le bot"),
+            "help": (help_command, "dresse la liste de toutes les commandes disponibles avec le bot")
+        }
+
+    def get_commands(self):
+        return self.__registered_commands
 
     async def perform_analysis(self, message, tag):
         """ The co-routine method detects the message's contents and checks if the tag of the bot is present.
@@ -86,7 +94,11 @@ class Analysis:
                     return await self.__regex[regex](self.__client, message, tag)
             await message.channel.send("Désolée, je ne comprend pas. :confounded:")
         else:
-            # ------- IMPORTANT NOTE -------
-            # The message was not a bot tag.
-            # Commands could be handled here !
-            pass
+            """ A command of the bot begins with the ! symbol. Try !help for more information. """
+            if message.content[:1] is "!":
+                cmd = re.compile("\s").split(message.content[1:], 1)
+                if cmd[0] in self.__registered_commands:
+                    return await self.__registered_commands[cmd[0]][0](self.__client, message, tag,
+                                                                       cmd[1] if len(cmd) > 1 else "", self)
+                else:
+                    return await message.channel.send("Désolée, la commande que tu essaies d'effectuer n'existe pas...")
