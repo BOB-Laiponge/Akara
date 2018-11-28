@@ -1,6 +1,8 @@
 import re
 
-from commands.others import help_command, presence
+from discord import Forbidden
+
+from commands.others import help_command, presence, akara_permission_su, test_mention_command
 from trecognition.politeness import say_hello, say_good_night, say_cc, say_hey, say_hi, say_hello_en, say_good_bye, \
     say_hello_2, say_plus_plus, say_bye
 from trecognition.tarandom import is_happy, insult, dice_launch, order66, moral_upper, joke_1, joke_2, q_mark, \
@@ -75,7 +77,9 @@ class Analysis:
             r"^.*(execute\s[l']*ord[er]{2}\s18).*$": say_bye
         }
         self.__registered_commands = {
-            "presence": (presence, "défini une nouvelle présence pour le bot"),
+            "test": (test_mention_command, "juste une commande de test"),
+            "sudo": (akara_permission_su, "éxécute la commande en tant que quelqu'un d'autre"),
+            "presence": (presence, "définit une nouvelle présence pour le bot"),
             "help": (help_command, "dresse la liste de toutes les commandes disponibles avec le bot")
         }
 
@@ -97,8 +101,15 @@ class Analysis:
             """ A command of the bot begins with the ! symbol. Try !help for more information. """
             if message.content[:1] is "!":
                 cmd = re.compile("\s").split(message.content[1:], 1)
+                try:
+                    await message.delete()
+                except Forbidden:
+                    await message.channel.send("*Akara n'a pas les permissions de supprimer les messages "
+                                               "dans ce channel.\n"
+                                               "Si un gentil modérateur lui accordait cette permission, "
+                                               "elle pourrait nettoyer toutes les commandes*", delete_after=60)
                 if cmd[0] in self.__registered_commands:
-                    return await self.__registered_commands[cmd[0]][0](self.__client, message, tag,
+                    return await self.__registered_commands[cmd[0]][0](self.__client, message.author, message, tag,
                                                                        cmd[1] if len(cmd) > 1 else "", self)
                 else:
                     return await message.channel.send("Désolée, la commande que tu essaies d'effectuer n'existe pas...")

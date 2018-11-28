@@ -32,15 +32,15 @@ class RestrictedCommandAccess:
         self.deny = deny_msg
 
     def __call__(self, func):
-        async def ck_perm(client, message, *args, test=False, **kwargs):
-            for i in message.author.roles:
+        async def ck_perm(client, sender, message, *args, test=False, **kwargs):
+            for i in sender.roles:
                 if self.pms[0] == 'everyone':
                     if not test:
-                        return await func(client, message, *args, **kwargs)
+                        return await func(client, sender, message, *args, **kwargs)
                     return True
                 elif i.id in self.pms:
                     if not test:
-                        return await func(client, message, *args, **kwargs)
+                        return await func(client, sender, message, *args, **kwargs)
                     return True
             if not test:
                 return await message.channel.send(self.deny)
