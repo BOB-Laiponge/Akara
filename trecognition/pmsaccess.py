@@ -1,3 +1,6 @@
+import discord
+
+
 class RestrictedCommandAccess:
 
     def __init__(self, permissions=None, deny_msg="Désolée, tu n'as pas l'autorisation d'effectuer cette action "
@@ -33,7 +36,7 @@ class RestrictedCommandAccess:
 
     def __call__(self, func):
         async def ck_perm(client, sender, message, *args, test=False, **kwargs):
-            for i in sender.roles:
+            for i in sender.roles if not isinstance(sender, discord.Message) else sender.author.roles:
                 if self.pms[0] == 'everyone':
                     if not test:
                         return await func(client, sender, message, *args, **kwargs)
