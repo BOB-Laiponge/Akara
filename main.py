@@ -11,8 +11,8 @@ text_analyser = Analysis(client)
 
 ''' These properties are used in order to retrieve the current version of the bot.
 Version code can be used in add-ons for example, in order to check if the version is new enough for a feature'''
-VERSION = "0.4.2"
-VERSION_CODE = 6
+VERSION = "0.4.3"
+VERSION_CODE = 7
 
 
 @client.event
