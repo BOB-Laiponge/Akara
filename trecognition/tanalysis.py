@@ -2,7 +2,7 @@ import re
 
 from discord import Forbidden
 
-from commands.others import help_command, presence, akara_permission_su, test_mention_command
+from commands.others import help_command, presence, akara_permission_su, test_mention_command, db
 from trecognition.politeness import say_hello, say_good_night, say_cc, say_hey, say_hi, say_hello_en, say_good_bye, \
     say_hello_2, say_plus_plus, say_bye
 from trecognition.tarandom import is_happy, insult, dice_launch, order66, moral_upper, joke_1, joke_2, q_mark, \
@@ -72,8 +72,9 @@ class Analysis:
         self.__registered_commands = {
             "test": (test_mention_command, "juste une commande de test"),
             "sudo": (akara_permission_su, "éxécute la commande en tant que quelqu'un d'autre"),
-            "presence": (presence, "définit une nouvelle présence pour le bot"),
-            "help": (help_command, "dresse la liste de toutes les commandes disponibles avec le bot")
+            "presence": (presence, "définit une nouvelle présence pour le bot (`!presence reset` pour reset)"),
+            "help": (help_command, "dresse la liste de toutes les commandes disponibles avec le bot"),
+            "db": (db, "envoie des commandes SQL à la base de données")
         }
 
     def get_commands(self):

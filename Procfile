@@ -1,1 +1,1 @@
-worker: python main.py $token
+worker: python main.py $token $DATABASE_URL
