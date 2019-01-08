@@ -36,16 +36,19 @@ class RestrictedCommandAccess:
 
     def __call__(self, func):
         async def ck_perm(client, sender, message, *args, test=False, **kwargs):
-            for i in sender.roles if not isinstance(sender, discord.Message) else sender.author.roles:
-                if self.pms[0] == 'everyone':
-                    if not test:
-                        return await func(client, sender, message, *args, **kwargs)
-                    return True
-                elif i.id in self.pms:
-                    if not test:
-                        return await func(client, sender, message, *args, **kwargs)
-                    return True
-            if not test:
-                return await message.channel.send(self.deny)
+            if not isinstance(message.channel, discord.DMChannel):
+                for i in sender.roles if not isinstance(sender, discord.Message) else sender.author.roles:
+                    if self.pms[0] == 'everyone':
+                        if not test:
+                            return await func(client, sender, message, *args, **kwargs)
+                        return True
+                    elif i.id in self.pms:
+                        if not test:
+                            return await func(client, sender, message, *args, **kwargs)
+                        return True
+                if not test:
+                    return await message.channel.send(self.deny)
+                return False
+            await message.channel.send("Désolée, tu ne peux pas effectuer de commandes en conversation privée !")
             return False
         return ck_perm
