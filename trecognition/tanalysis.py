@@ -1,12 +1,13 @@
 import re
 
+import discord
 from discord import Forbidden
 
 from commands.others import help_command, presence, akara_permission_su, test_mention_command, db
 from trecognition.politeness import say_hello, say_good_night, say_cc, say_hey, say_hi, say_hello_en, say_good_bye, \
     say_hello_2, say_plus_plus, say_bye
 from trecognition.tarandom import is_happy, insult, dice_launch, order66, moral_upper, joke_1, joke_2, q_mark, \
-    test_stuff, change_presence
+    test_stuff
 
 
 class Analysis:
@@ -33,7 +34,6 @@ class Analysis:
         self.__client = client
         self.__regex = {
             # tarandom.py
-            r"^.*change.*pr(e|é)sence.*$": change_presence,
             r"^.*(es\stu\sheureuse\s?).*$": is_happy,
             r"^.*(execute\s[l']*ord[er]{2}\s50(\D|$))": is_happy,
             r"^.*((salope?)|(voleuse)|(débile)|(idiot)|(machin)|(connasse)|(bitch)|(robot)|(encul)|(batard)|(merde)|"
@@ -80,30 +80,34 @@ class Analysis:
     def get_commands(self):
         return self.__registered_commands
 
-    async def perform_analysis(self, message, tag):
+    def get_regex(self):
+        return self.__regex
+
+    async def perform_analysis(self, message, user=None):
         """ The co-routine method detects the message's contents and checks if the tag of the bot is present.
         If it's detected, it will check the registered regular expressions above and execute the linked method
         @:param message {Message} the message which will be analysed
         @:param tag {String} the proper tag depending on the message's author """
-        if re.match(r"^.*<@!?" + re.escape(str(self.__client.user.id)) + r">.*$", message.content,
-                    re.IGNORECASE | re.UNICODE):
-            for regex in self.__regex:
-                if re.match(regex, message.content, re.IGNORECASE | re.UNICODE):
-                    return await self.__regex[regex](self.__client, message, tag)
-            await message.channel.send("Désolée, je ne comprend pas. :confounded:")
-        else:
-            """ A command of the bot begins with the ! symbol. Try !help for more information. """
-            if message.content[:1] is "!":
-                cmd = re.compile("\s").split(message.content[1:], 1)
-                try:
-                    await message.delete()
-                except Forbidden:
+        """ A command of the bot begins with the ! symbol. Try !help for more information. """
+        if message.content[:1] is "!":
+            cmd = re.compile("\s").split(message.content[1:], 1)
+            try:
+                await message.delete()
+            except Forbidden:
+                if not isinstance(message.channel, discord.abc.PrivateChannel):
                     await message.channel.send("*Akara n'a pas les permissions de supprimer les messages "
                                                "dans ce channel.\n"
                                                "Si un gentil modérateur lui accordait cette permission, "
-                                               "elle pourrait nettoyer toutes les commandes*", delete_after=60)
-                if cmd[0] in self.__registered_commands:
-                    return await self.__registered_commands[cmd[0]][0](self.__client, message.author, message, tag,
-                                                                       cmd[1] if len(cmd) > 1 else "", self)
-                else:
-                    return await message.channel.send("Désolée, la commande que tu essaies d'effectuer n'existe pas...")
+                                               "elle pourrait nettoyer toutes les commandes*", delete_after=30)
+            if cmd[0] in self.__registered_commands:
+                return await self.__registered_commands[cmd[0]][0](self.__client, message,
+                                                                   cmd[1] if len(cmd) > 1 else "", self, user=user)
+            else:
+                return await message.channel.send("Désolée, la commande que tu essaies d'effectuer n'existe pas...")
+        else:
+            if re.match(r"^.*<@!?" + re.escape(str(self.__client.user.id)) + r">.*$", message.content,
+                        re.IGNORECASE | re.UNICODE):
+                for regex in self.__regex:
+                    if re.match(regex, message.content, re.IGNORECASE | re.UNICODE):
+                        return await self.__regex[regex](self.__client, message, user=user)
+                await message.channel.send("Désolée, je ne comprend pas. :confounded:")
