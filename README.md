@@ -23,3 +23,5 @@ It's used in other contexts, for example during the `!help` command execution, w
 VERSION = "0.4.1"
 VERSION_CODE = 5
 ```
+
+**Important: for all commands, sender arg has been removed, please use `message.author if user=None else user` instead.**
